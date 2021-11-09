@@ -1,9 +1,23 @@
 import { db } from "firebase";
-import { addDoc, collection } from "firebase/firestore";
-import React, { useState } from "react";
+import { addDoc, collection, getDocs } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 
 const Home = () => {
   const [tweet, setTweet] = useState("");
+  const [tweets, setTweets] = useState([]);
+  const getTweets = async () => {
+    const querySnapshot = await getDocs(collection(db, "tweets"));
+    querySnapshot.forEach((doc) => {
+      const tweetObj = {
+        ...doc.data(),
+        id: doc.id,
+      };
+      setTweets((prev) => [tweetObj, ...prev]);
+    });
+  };
+  useEffect(() => {
+    getTweets();
+  }, []);
   const onSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -34,6 +48,13 @@ const Home = () => {
         />
         <input type="submit" value="Tweet" />
       </form>
+      <div>
+        {tweets.map((tweet) => (
+          <div key={tweet.id}>
+            <h4>{tweet.tweet}</h4>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
