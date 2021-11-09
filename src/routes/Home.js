@@ -1,3 +1,4 @@
+import Tweet from "components/Tweet";
 import { auth, db } from "firebase";
 import {
   addDoc,
@@ -11,6 +12,7 @@ import React, { useEffect, useState } from "react";
 const Home = ({ userObj }) => {
   const [tweet, setTweet] = useState("");
   const [tweets, setTweets] = useState([]);
+  const user = auth.currentUser;
   useEffect(() => {
     const q = query(collection(db, "tweets"), orderBy("createdAt", "desc"));
     onSnapshot(q, (snapshot) => {
@@ -23,7 +25,6 @@ const Home = ({ userObj }) => {
   }, []);
   const onSubmit = async (event) => {
     event.preventDefault();
-    const user = auth.currentUser;
     try {
       await addDoc(collection(db, "tweets"), {
         text: tweet,
@@ -55,9 +56,11 @@ const Home = ({ userObj }) => {
       </form>
       <div>
         {tweets.map((tweet) => (
-          <div key={tweet.id}>
-            <h4>{tweet.text}</h4>
-          </div>
+          <Tweet
+            key={tweet.id}
+            tweetObj={tweet}
+            isOwner={tweet.creatorId === user.uid}
+          />
         ))}
       </div>
     </div>
