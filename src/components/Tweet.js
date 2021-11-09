@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
-import { db } from "firebase";
+import { db, storage } from "firebase";
+import { deleteObject, ref } from "firebase/storage";
 
 const Tweet = ({ tweetObj, isOwner }) => {
   const [editing, setEditing] = useState(false);
@@ -9,6 +10,9 @@ const Tweet = ({ tweetObj, isOwner }) => {
     const ok = window.confirm("Are you sure you want to delete this tweet?");
     if (ok) {
       await deleteDoc(doc(db, "tweets", `${tweetObj.id}`));
+      if (tweetObj.attachmentUrl !== "") {
+        await deleteObject(ref(storage, tweetObj.attachmentUrl));
+      }
     }
   };
   const toogleEditing = () => setEditing((prev) => !prev);
