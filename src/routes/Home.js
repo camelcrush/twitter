@@ -1,8 +1,8 @@
-import { db } from "firebase";
+import { auth, db } from "firebase";
 import { addDoc, collection, getDocs } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 
-const Home = () => {
+const Home = ({ userObj }) => {
   const [tweet, setTweet] = useState("");
   const [tweets, setTweets] = useState([]);
   const getTweets = async () => {
@@ -20,10 +20,12 @@ const Home = () => {
   }, []);
   const onSubmit = async (event) => {
     event.preventDefault();
+    const user = auth.currentUser;
     try {
       await addDoc(collection(db, "tweets"), {
-        tweet,
+        text: tweet,
         createdAt: Date.now(),
+        creatorId: user.uid,
       });
     } catch (e) {
       console.error("Error adding document: ", e);
@@ -51,7 +53,7 @@ const Home = () => {
       <div>
         {tweets.map((tweet) => (
           <div key={tweet.id}>
-            <h4>{tweet.tweet}</h4>
+            <h4>{tweet.text}</h4>
           </div>
         ))}
       </div>
