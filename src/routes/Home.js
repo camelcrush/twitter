@@ -1,7 +1,13 @@
 import Tweet from "components/Tweet";
 import { auth, db, storage } from "firebase";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
-import { ref, uploadString } from "firebase/storage";
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  addDoc,
+} from "firebase/firestore";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
 import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -21,20 +27,30 @@ const Home = ({ userObj }) => {
     });
   }, []);
   const onSubmit = async (event) => {
-    const fileRef = ref(storage, `${user.uid}/${uuidv4()}`);
-    const response = await uploadString(fileRef, attachment, "data_url");
-    console.log(response);
-    // event.preventDefault();
-    // try {
-    //   await addDoc(collection(db, "tweets"), {
-    //     text: tweet,
-    //     createdAt: Date.now(),
-    //     creatorId: user.uid,
-    //   });
-    // } catch (e) {
-    //   console.error("Error adding document: ", e);
-    // }
-    // setTweet("");
+    let attachmentUrl = "";
+    if (attachment !== "") {
+      const attachmentRef = ref(storage, `${user.uid}/${uuidv4()}`);
+      const response = await uploadString(
+        attachmentRef,
+        attachment,
+        "data_url"
+      );
+      attachmentUrl = await getDownloadURL(response.ref);
+    }
+    const tweetObj = {
+      text: tweet,
+      createdAt: Date.now(),
+      creatorId: user.uid,
+      attachmentUrl,
+    };
+    event.preventDefault();
+    try {
+      await addDoc(collection(db, "tweets"), tweetObj);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+    setTweet("");
+    setAttachment("");
   };
   const onChange = (event) => {
     const {
