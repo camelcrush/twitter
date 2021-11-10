@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { db, storage } from "firebase";
 import { deleteObject, ref } from "firebase/storage";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 
 const Tweet = ({ tweetObj, isOwner }) => {
   const [editing, setEditing] = useState(false);
@@ -15,7 +17,7 @@ const Tweet = ({ tweetObj, isOwner }) => {
       }
     }
   };
-  const toogleEditing = () => setEditing((prev) => !prev);
+  const toggleEditing = () => setEditing((prev) => !prev);
   const onChage = (event) => {
     const {
       target: { value },
@@ -30,36 +32,40 @@ const Tweet = ({ tweetObj, isOwner }) => {
     setEditing(false);
   };
   return (
-    <div>
+    <div className="nweet">
       {editing ? (
         <>
-          <form onSubmit={onSubmit}>
+          <form onSubmit={onSubmit} className="container nweetEdit">
             <input
               type="text"
               onChange={onChage}
               placeholder="Edit your tweet"
+              autoFocus
               value={newTweet}
               required
+              className="formInput"
             />
-            <input type="submit" value="Update" />
+            <input type="submit" value="Update" className="formBtn" />
           </form>
+          <span onClick={toggleEditing} className="formBtn cancelBtn">
+            Cancel
+          </span>
         </>
       ) : (
         <>
           <h4>{tweetObj.text}</h4>
           {tweetObj.attachmentUrl && (
-            <img
-              src={tweetObj.attachmentUrl}
-              width="50px"
-              height="50px"
-              alt=""
-            />
+            <img alt="" src={tweetObj.attachmentUrl} />
           )}
           {isOwner && (
-            <>
-              <button onClick={onClickDelete}>Delete Nweet</button>
-              <button onClick={toogleEditing}>Edit Nweet</button>
-            </>
+            <div className="nweet__actions">
+              <span onClick={onClickDelete}>
+                <FontAwesomeIcon icon={faTrash} />
+              </span>
+              <span onClick={toggleEditing}>
+                <FontAwesomeIcon icon={faPencilAlt} />
+              </span>
+            </div>
           )}
         </>
       )}
