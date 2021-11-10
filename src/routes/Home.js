@@ -15,7 +15,6 @@ const Home = ({ userObj }) => {
   const [tweet, setTweet] = useState("");
   const [tweets, setTweets] = useState([]);
   const [attachment, setAttachment] = useState();
-  const user = auth.currentUser;
   useEffect(() => {
     const q = query(collection(db, "tweets"), orderBy("createdAt", "desc"));
     onSnapshot(q, (snapshot) => {
@@ -29,7 +28,7 @@ const Home = ({ userObj }) => {
   const onSubmit = async (event) => {
     let attachmentUrl = "";
     if (attachment !== "") {
-      const attachmentRef = ref(storage, `${user.uid}/${uuidv4()}`);
+      const attachmentRef = ref(storage, `${userObj.uid}/${uuidv4()}`);
       const response = await uploadString(
         attachmentRef,
         attachment,
@@ -40,7 +39,7 @@ const Home = ({ userObj }) => {
     const tweetObj = {
       text: tweet,
       createdAt: Date.now(),
-      creatorId: user.uid,
+      creatorId: userObj.uid,
       attachmentUrl,
     };
     event.preventDefault();
@@ -97,7 +96,7 @@ const Home = ({ userObj }) => {
           <Tweet
             key={tweet.id}
             tweetObj={tweet}
-            isOwner={tweet.creatorId === user.uid}
+            isOwner={tweet.creatorId === userObj.uid}
           />
         ))}
       </div>
