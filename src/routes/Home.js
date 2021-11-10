@@ -1,5 +1,5 @@
 import Tweet from "components/Tweet";
-import { auth, db, storage } from "firebase";
+import { db, storage } from "firebase";
 import {
   collection,
   onSnapshot,
@@ -14,7 +14,7 @@ import { v4 as uuidv4 } from "uuid";
 const Home = ({ userObj }) => {
   const [tweet, setTweet] = useState("");
   const [tweets, setTweets] = useState([]);
-  const [attachment, setAttachment] = useState();
+  const [attachment, setAttachment] = useState("");
   useEffect(() => {
     const q = query(collection(db, "tweets"), orderBy("createdAt", "desc"));
     onSnapshot(q, (snapshot) => {
@@ -86,7 +86,7 @@ const Home = ({ userObj }) => {
         <input type="submit" value="Tweet" />
         {attachment && (
           <div>
-            <img src={attachment} width="50px" height="50px" />
+            <img src={attachment} width="50px" height="50px" alt="" />
             <button onClick={onClearAttachment}>Clear</button>
           </div>
         )}
